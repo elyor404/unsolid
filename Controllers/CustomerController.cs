@@ -1,39 +1,17 @@
 using Unsolid.Models;
-using Unsolid.Services;
 using Microsoft.AspNetCore.Mvc;
+using Unsolid.Services.Abstractions;
 
 namespace Unsolid.Controllers;
 
 [ApiController]
-public class CustomerController : ControllerBase
+public class CustomerController(ICustomerService customerService) : ControllerBase
 {
     [HttpPost("customers")]
-    public IActionResult CreateCustomer([FromBody] Models.CustomerCreateRequest request)
+    public IActionResult CreateCustomer([FromBody] CustomerCreateRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
+        var customer = new Customer
         {
-            return BadRequest(new { error = "Name is required" });
-        }
-        if (string.IsNullOrWhiteSpace(request.Email))
-        {
-            return BadRequest(new { error = "Email is required" });
-        }
-        if (!BusinessService.ValidateEmail(request.Email))
-        {
-            return BadRequest(new { error = "Invalid email format" });
-        }
-        if (string.IsNullOrWhiteSpace(request.Phone))
-        {
-            return BadRequest(new { error = "Phone is required" });
-        }
-        if (!BusinessService.ValidatePhone(request.Phone))
-        {
-            return BadRequest(new { error = "Invalid phone format" });
-        }
-
-        var customer = new Models.Customer
-        {
-            Id = 0,
             Name = request.Name,
             Email = request.Email,
             Phone = request.Phone,
@@ -45,18 +23,16 @@ public class CustomerController : ControllerBase
             MembershipType = "Regular"
         };
 
-        DataService.AddCustomer(customer);
+        customerService.AddCustomer(customer);
         return Created($"/customers/{customer.Id}", customer);
     }
 
     [HttpGet("customers/{id}")]
     public IActionResult GetCustomer(int id)
     {
-        var customer = DataService.GetCustomer(id);
+        var customer = customerService.GetCustomer(id);
         if (customer == null)
-        {
             return NotFound(new { error = "Customer not found" });
-        }
         return Ok(customer);
     }
 }

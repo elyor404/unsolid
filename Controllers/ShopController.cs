@@ -1,16 +1,17 @@
 using Unsolid.Models;
 using Unsolid.Services;
 using Microsoft.AspNetCore.Mvc;
+using Unsolid.Services.Abstractions;
 
 namespace Unsolid.Controllers;
 
 [ApiController]
-public class ShopController : ControllerBase
+public class ShopController(IProductService productService) : ControllerBase
 {
     [HttpGet("products")]
     public IActionResult GetProducts()
     {
-        var products = DataService.GetProducts();
+        var products = productService.GetProducts();
         var result = products.Select(p => new
         {
             p.Id,
@@ -26,15 +27,13 @@ public class ShopController : ControllerBase
     [HttpGet("products/{id}")]
     public IActionResult GetProduct(int id)
     {
-        var product = DataService.GetProduct(id);
+        var product = productService.GetProduct(id);
+
         if (product == null)
-        {
             return NotFound(new { error = "Product not found" });
-        }
-        if (!product.IsActive)
-        {
+        else if (!product.IsActive)
             return BadRequest(new { error = "Product is not active" });
-        }
+
         return Ok(new
         {
             product.Id,
@@ -48,15 +47,15 @@ public class ShopController : ControllerBase
     }
 
     [HttpPost("products")]
-    public IActionResult CreateProduct([FromBody] Models.Product product)
+    public IActionResult CreateProduct([FromBody] Product product)
     {
-        var validation = BusinessService.ValidateProduct(product.Name, product.Price, product.Stock);
-        if (validation != "OK")
-        {
-            return BadRequest(new { error = validation });
-        }
+        // var validation = BusinessService.ValidateProduct(product.Name, product.Price, product.Stock);
+        // if (validation != "OK")
+        // {
+        //     return BadRequest(new { error = validation });
+        // }
 
-        DataService.AddProduct(product);
+        productService.AddProduct(product);
         return Created($"/products/{product.Id}", product);
     }
 
@@ -68,7 +67,7 @@ public class ShopController : ControllerBase
             return BadRequest(new { error = "Discount percentage must be between 1 and 100" });
         }
 
-        var product = DataService.GetProduct(id);
+        var product = productService.GetProduct(id);
         if (product == null)
         {
             return NotFound(new { error = "Product not found" });
