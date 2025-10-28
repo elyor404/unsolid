@@ -15,7 +15,6 @@ namespace Unsolid.Services
             product.Discount = 0;
             Products.Add(product);
         }
-
         public Product? GetProduct(int id)
             => Products.FirstOrDefault(p => p.Id == id);
 

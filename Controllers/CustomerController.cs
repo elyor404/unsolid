@@ -36,4 +36,3 @@ public class CustomerController(ICustomerService customerService) : ControllerBa
         return Ok(customer);
     }
 }
-

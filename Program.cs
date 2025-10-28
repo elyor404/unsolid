@@ -14,19 +14,15 @@ builder.Services.AddValidatorsFromAssemblyContaining<CustomerCreateRequestValida
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
-
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IDataSeeder, DataSeeder>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 
-
-
-
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -40,5 +36,4 @@ using (var scope = app.Services.CreateScope())
     var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
     seeder.InitializeData();
 }
-
     app.Run();

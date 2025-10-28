@@ -14,7 +14,6 @@ namespace Unsolid.Services
             customer.RegistrationDate = DateTime.Now;
             Customers.Add(customer);
         }
-
         public Customer? GetCustomer(int id)
             => Customers.FirstOrDefault(c => c.Id == id);
     }

@@ -1,5 +1,4 @@
 using Unsolid.Models;
-using Unsolid.Services;
 using Microsoft.AspNetCore.Mvc;
 using Unsolid.Services.Abstractions;
 
@@ -49,12 +48,6 @@ public class ShopController(IProductService productService) : ControllerBase
     [HttpPost("products")]
     public IActionResult CreateProduct([FromBody] Product product)
     {
-        // var validation = BusinessService.ValidateProduct(product.Name, product.Price, product.Stock);
-        // if (validation != "OK")
-        // {
-        //     return BadRequest(new { error = validation });
-        // }
-
         productService.AddProduct(product);
         return Created($"/products/{product.Id}", product);
     }
